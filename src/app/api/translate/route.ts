@@ -10,7 +10,6 @@ export async function POST(req, body) {
 
     const headers = {
         'Content-Type': 'application/json', // You can adjust the Content-Type based on your needs
-        Authorization: 'DeepL-Auth-Key d3c3ab6d-b9d4-b262-40e8-85082c089b71:fx', // Replace with your actual authorization token
     }
 
     const wordToTranslate = await req.json()
