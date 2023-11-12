@@ -1,0 +1,25 @@
+.dimmer {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(
+        0,
+        0,
+        0,
+        0.5
+    ); /* Adjust the opacity (last value) to control dimness */
+    z-index: 1;
+    display: block; /* Initially hidden */
+}
+
+.content {
+    position: relative;
+    left: 25%;
+    z-index: 2;
+    /* Your page content styles */
+}

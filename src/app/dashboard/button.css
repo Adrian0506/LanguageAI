@@ -1,0 +1,66 @@
+.close-button {
+    background-color: red;
+    color: white;
+    border: 2px solid red;
+    width: 50px; /* Adjust the width and height to create a circle */
+    height: 50px;
+    border-radius: 50%; /* Makes it a circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background-color 0.3s,
+        border-color 0.3s;
+}
+
+.close-button:hover {
+    background-color: white;
+    color: red;
+    border-color: red;
+}
+
+.icon {
+    font-size: 24px;
+    font-weight: 100;
+}
+
+.open-button {
+    background-color: green;
+    color: white;
+    border: 2px solid green;
+    width: 50px; /* Adjust the width and height to create a circle */
+    height: 50px;
+    border-radius: 50%; /* Makes it a circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background-color 0.3s,
+        border-color 0.3s;
+}
+
+.open-button:hover {
+    background-color: white;
+    color: green;
+    border-color: green;
+}
+
+.red-button {
+    background-color: #ff5a5f;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 2px solid #ff5a5f;
+    border-radius: 5px;
+    cursor: pointer;
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+}
+
+.red-button:hover {
+    background-color: #fff;
+    color: #ff5a5f;
+}
