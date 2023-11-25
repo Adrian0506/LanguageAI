@@ -90,6 +90,13 @@ export const columns: ColumnDef<Payment>[] = [
             <div className="lowercase">{row.getValue('title')}</div>
         ),
     },
+    {
+        accessorKey: 'dateCreated',
+        header: 'Created date',
+        cell: ({ row }) => (
+            <div className="capitalize">{row.getValue('dateCreated')}</div>
+        ),
+    },
 
     {
         id: 'actions',
@@ -111,13 +118,9 @@ export const columns: ColumnDef<Payment>[] = [
                                 navigator.clipboard.writeText(payment.id)
                             }
                         >
-                            Copy payment ID
+                            Delete
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>
-                            View payment details
-                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
@@ -202,46 +205,38 @@ export function DataTableDemo({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        <Anime
-                            delay={anime.stagger(500)}
-                            translateX="13rem"
-                            scale={[0.5, 1]}
-                        >
-                            {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={
-                                            row.getIsSelected() && 'selected'
-                                        }
-                                        onClick={() => {
-                                            setCurrentCardSelectID(
-                                                row.original.id
-                                            )
-                                            setShowFlashCard(true)
-                                        }}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-24 text-center"
-                                    >
-                                        No results.
-                                    </TableCell>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={
+                                        row.getIsSelected() && 'selected'
+                                    }
+                                    onClick={() => {
+                                        setCurrentCardSelectID(row.original.id)
+                                        setShowFlashCard(true)
+                                    }}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
-                            )}
-                        </Anime>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </div>

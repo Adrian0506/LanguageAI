@@ -10,9 +10,11 @@ import { AddFlashCard } from './AddFlashCard/AddFlashCard'
 import { Toaster } from '@/components/ui/toaster'
 
 import './button.css'
+import AIChatBox from './AIChatBox/AIChatBox'
+import Input from './Input/Input'
 
 export default function Dashboard() {
-    const [flashCards, setFlashCards] = React.useState({})
+    const [flashCards, setFlashCards] = React.useState([])
     const [showFlashCard, setShowFlashCard] = React.useState(false)
     const [showCreateCard, setShowCreateCard] = React.useState(false)
     const [currentCardSelectedID, setCurrentCardSelectID] = React.useState(0)
@@ -28,6 +30,7 @@ export default function Dashboard() {
             .catch((err) => err)
     }, [])
 
+    console.log(flashCards, 'from here')
     return (
         <div className="container ">
             <div className="border-b-4 black">
@@ -39,7 +42,7 @@ export default function Dashboard() {
                         setCurrentCardSelectID={setCurrentCardSelectID}
                     />
                 ) : (
-                    'Loading...'
+                    'No cards to show =[ '
                 )}
             </div>
             {showCreateCard ? (
@@ -63,6 +66,7 @@ export default function Dashboard() {
                     Add a card deck
                 </button>
             </div>
+            <AIChatBox />
             <Toaster />
         </div>
     )
