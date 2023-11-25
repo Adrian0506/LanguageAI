@@ -10,6 +10,7 @@ export async function POST(req, body) {
 
     const headers = {
         'Content-Type': 'application/json', // You can adjust the Content-Type based on your needs
+        Authorization: `DeepL-Auth-Key ${process.env.DEEPL_APIKEY}`, // Replace with your actual authorization token
     }
 
     const wordToTranslate = await req.json()
@@ -30,8 +31,8 @@ export async function POST(req, body) {
                 headers,
             }
         )
+        console.log(response.data)
         requestData = response.data
-
         // Any other code you want to execute after a successful request
     } catch (error) {
         // Handle errors here

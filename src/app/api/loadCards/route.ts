@@ -1,54 +1,30 @@
 import { NextResponse } from 'next/server'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-
-const data = [
-    {
-        id: '2312',
-        title: 'Example card',
-        wordsToStudy: [
-            ['test1', 'testo'],
-            ['test2', 'testo'],
-            ['test3', 'testo'],
-            ['test4', 'testo'],
-        ],
-        reviewStatus: 'Unreviewed',
-        dateCreated: '',
-    },
-    {
-        id: '1313',
-        title: 'Example card',
-        wordsToStudy: [
-            ['test1', 'testo'],
-            ['test2', 'testo'],
-            ['test3', 'testo'],
-            ['test4', 'testo'],
-        ],
-        reviewStatus: 'Unreviewed',
-    },
-    {
-        id: '4323',
-        title: 'Example card',
-        wordsToStudy: [
-            ['test1', 'testo'],
-            ['test2', 'testo'],
-            ['test3', 'testo'],
-            ['test4', 'testo'],
-        ],
-        reviewStatus: 'Reviewed',
-    },
-]
+import { connectToDataBase } from '../db/connectToDb'
+import mongoose from 'mongoose'
+import User from '../db/userSchema'
 
 export async function POST(req, res) {
     const { getUser, isAuthenticated } = getKindeServerSession()
-
+    let data = {}
     if (!isAuthenticated()) {
         return new Response('Unauthorized', { status: 401 })
     }
-
-    const current = await req.json()
-    console.log(current.userKey, 'here')
-    // TODO: SEARCH FOR USER KEY
-    // LOAD CURRENT CARDS
-    // IF NONE SEND EMPTY ARRAY
+    try {
+        await connectToDataBase()
+        const current = await req.json()
+        const currentUser = await User.find({ userId: current.userKey })
+        if (!currentUser.length) {
+            const alice = new User({
+                userId: current.userKey,
+                currentCards: [],
+            })
+            await alice.save()
+        } else {
+            data = currentUser[0].currentCards
+        }
+    } catch (err) {
+        console.log(err)
+    }
     return NextResponse.json({ data })
 }

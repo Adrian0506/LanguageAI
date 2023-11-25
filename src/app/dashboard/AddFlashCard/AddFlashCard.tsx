@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import axios from 'axios'
+import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -11,7 +12,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import Input from '../Input/Input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
 
@@ -20,10 +21,9 @@ import '../dimmer.css'
 //TODO: better variable naming
 export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
     const [inputs, setInputs] = React.useState([[]])
-    const [data, setData] = React.useState({
-        reviewStatus: 'Reviewed',
-        id: '123',
-    })
+    const [data, setData] = React.useState({})
+    const [loading, setLoading] = React.useState(false)
+
     const { toast } = useToast()
 
     const onChange = (e) => {
@@ -51,7 +51,6 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
         }
 
         setData(data)
-        console.log(data)
     }
 
     const setTitleName = (e) => {
@@ -60,14 +59,47 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
         console.log(data, titleName)
     }
 
+    const validateInput = (): boolean => {
+        if (!data.title || !data.title.length) {
+            return false
+        }
+        if (!data.wordsToStudy) {
+            return false
+        }
+        for (let key in data.wordsToStudy) {
+            console.log(data.wordsToStudy[key], 'logged')
+            for (let i = 0; i < data.wordsToStudy[key].length; i++) {
+                if (data.wordsToStudy[key].length <= 1) {
+                    return false
+                }
+                if (data.wordsToStudy[key][i] === '') {
+                    return false
+                }
+            }
+        }
+        return true
+    }
     const onCreate = (e) => {
         e.preventDefault()
-
-        setFlashCards((prev) => {
-            return [...prev, data]
-        })
         //TODO: MAKE API CALL, TOAST DEPENDING ON 200 OR 500
-
+        if (!validateInput()) {
+            toast({
+                title: `There was a error saving your card. Please fill out the required information`,
+                description: `Some inputs are missing`,
+                variant: 'destructive',
+            })
+            return
+        }
+        axios
+            .post('/api/createCard', {
+                userKey: window.localStorage.userId,
+                data: data,
+            })
+            .then((cards) => {
+                setFlashCards((prev) => [...prev, data])
+                console.log(cards, 'from here')
+            })
+            .catch((err) => err)
         toast({
             title: `Card has been saved`,
             description: `Card has been created: "${data.title}"`,
@@ -76,6 +108,7 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
     }
 
     const translateWithDeep = (id) => {
+        setLoading(true)
         const textToTranslate = data['wordsToStudy'][id][0]
 
         const headers = {
@@ -88,16 +121,20 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
                     wordData.data.requestData.translations[0].text
                 const textField = document.getElementById(
                     `${id} - to translate`
-                )
+                ) as HTMLInputElement
                 textField.value = translatedWord
                 data['wordsToStudy'][id][1] = translatedWord
                 setData(data)
+                setLoading(false)
             })
-            .catch((err) => err)
+            .catch((err) => {
+                console.error(err)
+                setLoading(false)
+            })
     }
     return (
         <div className="flex center-items dimmer">
-            <Card className="fixed z-10 w-3/4 bg-white">
+            <Card className="fixed z-10 w-2/4 bg-white">
                 <CardHeader>
                     <CardTitle>Create a new card</CardTitle>
                     <CardDescription>
@@ -107,11 +144,9 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
                 <CardContent>
                     <div className="grid items-center w-full gap-4">
                         <div className="flex flex-col space-y-1.5">
-                            Card word
-                            <Label htmlFor="name">Word</Label>
                             <Input
                                 onChange={setTitleName}
-                                placeholder="Name your flashcard"
+                                placeHolder="Name your flashcard"
                             ></Input>
                             <div className="flex flex-col gap-8">
                                 {inputs.map((item, index) => {
@@ -120,21 +155,29 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
                                             <Input
                                                 id={index.toString()}
                                                 onChange={onChange}
-                                                placeholder="Name of your word"
+                                                placeHolder="Name of your word"
                                             />
-                                            <button
-                                                onClick={() =>
-                                                    translateWithDeep(
-                                                        index.toString()
-                                                    )
-                                                }
-                                            >
-                                                Translate
-                                            </button>
+                                            {!loading ? (
+                                                <Button
+                                                    onClick={() =>
+                                                        translateWithDeep(
+                                                            index.toString()
+                                                        )
+                                                    }
+                                                    variant="secondary"
+                                                >
+                                                    Secondary
+                                                </Button>
+                                            ) : (
+                                                <Button disabled>
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                    Please wait
+                                                </Button>
+                                            )}
                                             <Input
                                                 id={`${index.toString()} - to translate`}
                                                 onChange={onChange}
-                                                placeholder="Name of your translated word"
+                                                placeHolder="Name of your translated word"
                                             />
                                         </div>
                                     )
@@ -142,8 +185,11 @@ export function AddFlashCard({ setShowCreateCard, setFlashCards }) {
                             </div>
                         </div>
                     </div>
-                    <button onClick={() => setInputs([...inputs, []])}>
-                        Add a new word
+                    <button
+                        onClick={() => setInputs([...inputs, []])}
+                        className="red-button"
+                    >
+                        Add a word
                     </button>
                     <CardFooter className="flex justify-between gap-8">
                         <Button

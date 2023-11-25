@@ -1,13 +1,12 @@
 import React from 'react'
 import './card.css'
 
-const Card = ({ currentWords, currentIndex }) => {
+const Card = ({ currentWords, currentIndex, setEndOfCards }) => {
     const [flipCard, setFlipCard] = React.useState(false)
     const [isFlipped, setIsFlipped] = React.useState(false)
     const handleCardClick = () => {
         setIsFlipped(!isFlipped)
     }
-
     return (
         <div
             className={`flashcard ${isFlipped ? 'flipped' : ''}`}

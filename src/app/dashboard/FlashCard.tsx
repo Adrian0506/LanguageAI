@@ -9,10 +9,10 @@ import { AiOutlineClose } from 'react-icons/ai'
 export function CardTable({ disableCard, cardData, currentCardSelectedID }) {
     const [currentWords, setCurrentWords] = React.useState([0, 0])
     const [currentIndex, setCurrentIndex] = React.useState(0)
-
+    const [endOfCards, setEndOfCards] = React.useState(false)
     //TODO: Add support for incorrect words and correct words
-    const [incorrectWords, setIncorrectWords] = React.useState(0)
-    const [correctWords, setCorrectWords] = React.useState(0)
+    const [incorrectWords, setIncorrectWords] = React.useState([])
+    const [correctWords, setCorrectWords] = React.useState([])
 
     React.useEffect(() => {
         cardData.forEach((item) => {
@@ -21,6 +21,37 @@ export function CardTable({ disableCard, cardData, currentCardSelectedID }) {
             }
         })
     }, [])
+    console.log(cardData, 'from this component')
+    const setNextCard = (answer) => {
+        if (!answer) {
+            setIncorrectWords((prev) => [...prev, currentWords[currentIndex]])
+        } else {
+            setCorrectWords((prev) => [...prev, currentWords[currentIndex]])
+        }
+
+        console.log(correctWords)
+        console.log(currentIndex, currentWords, 'LENGTHS')
+        if (!currentWords[currentIndex + 1]) {
+            console.log(currentIndex, currentWords, 'here')
+            setEndOfCards(true)
+            return
+        }
+        setCurrentIndex((prev) => prev + 1)
+    }
+
+    const resetGame = (resetFullGame: boolean) => {
+        if (resetFullGame) {
+            setCurrentWords(correctWords)
+            setCurrentIndex(0)
+            setEndOfCards(false)
+            setCorrectWords([])
+        } else {
+            setCurrentWords(incorrectWords)
+            setCurrentIndex(0)
+            setEndOfCards(false)
+            setIncorrectWords([])
+        }
+    }
 
     return (
         <div className="dimmer">
@@ -28,42 +59,56 @@ export function CardTable({ disableCard, cardData, currentCardSelectedID }) {
                 <CardHeader>
                     <div className="flex flex-row justify-between">
                         <CardTitle className="text-5xl ">
-                            Vocabulary Quiz 2
+                            {cardData.title}
                         </CardTitle>
                         <AiOutlineClose onClick={() => disableCard(false)} />
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex flex-col">
-                        <div className="flex justify-center">
-                            <WordCard
-                                currentWords={currentWords}
-                                currentIndex={currentIndex}
-                            />
+                    {!endOfCards ? (
+                        <div className="flex flex-col">
+                            <div className="flex justify-center">
+                                <WordCard
+                                    setEndOfCards={setEndOfCards}
+                                    currentWords={currentWords}
+                                    currentIndex={currentIndex}
+                                />
+                            </div>
+                            <div className="flex flex-row justify-center gap-8">
+                                <button className="close-button">
+                                    <div
+                                        onClick={() => setNextCard(false)}
+                                        className="icon"
+                                    >
+                                        X
+                                    </div>
+                                </button>
+                                <button className="open-button">
+                                    <div
+                                        className="icon"
+                                        onClick={() => setNextCard(true)}
+                                    >
+                                        ✓
+                                    </div>
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex flex-row justify-center gap-8">
-                            <button className="close-button">
-                                <div
-                                    onClick={() =>
-                                        setCurrentIndex((prev) => prev + 1)
-                                    }
-                                    className="icon"
-                                >
-                                    X
-                                </div>
+                    ) : null}
+
+                    {endOfCards ? (
+                        <>
+                            <button onClick={() => resetGame(true)}>
+                                {correctWords.length} CORRECTO
                             </button>
-                            <button className="open-button">
-                                <div
-                                    className="icon"
-                                    onClick={() =>
-                                        setCurrentIndex((prev) => prev + 1)
-                                    }
-                                >
-                                    ✓
-                                </div>
-                            </button>
-                        </div>
-                    </div>
+                            {incorrectWords.length ? (
+                                <button onClick={() => resetGame(false)}>
+                                    {incorrectWords.length} INCORRECTO
+                                </button>
+                            ) : (
+                                <h1>Hooray you got all the words correct!</h1>
+                            )}
+                        </>
+                    ) : null}
                 </CardContent>
             </Card>
         </div>
